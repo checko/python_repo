@@ -1,6 +1,6 @@
 import os
 i=0
-for root, dirlist, fileslit in os.walk("./"):
+for root, dirlist, filelist in os.walk("./"):
 	toremove=[]
 
 	for ss in ['.repo','out']:
