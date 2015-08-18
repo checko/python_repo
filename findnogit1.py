@@ -4,32 +4,35 @@ import xml.dom.minidom
 emptyproject = []
 gitproject = []
 
-def recursive_list( pathname ):
+def recursive_list( pathname , foundgit ):
 	global emptyproject
 	global gitproject
 	dirs = os.listdir( pathname )
 	if '.git' in dirs:
 		gitproject.append(pathname)
-		return
+		foundgit = True;
 	if not dirs:
-		emptyproject.append(pathname)
+		if not foundgit:
+			emptyproject.append(pathname)
 		return
 	for item in dirs:
 		itempath = os.path.join(pathname,item)
 		if os.path.isdir(itempath):
-			recursive_list( itempath )
+			if item != '.git':
+				recursive_list( itempath , foundgit )
 
 for ii in os.listdir("."):
 	if ii not in ['out','.repo']:
 		iipath = os.path.join(".",ii)
 		if os.path.isdir(iipath):
-			recursive_list( iipath )
+			recursive_list( iipath , False)
 
 xmlroot = xml.dom.minidom.parse('./.repo/manifest.xml')
 manifestproj = []
 for node in xmlroot.childNodes[0].childNodes:
 	if node.nodeName == 'project':
-		manifestproj.append(os.path.join('./',node.getAttribute('path')))
+		if 'notdefault' not in node.getAttribute('groups'):
+			manifestproj.append(os.path.join('./',node.getAttribute('path')))
 
 
 print "----------------------------------"
